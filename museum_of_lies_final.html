@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Museum of Lies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --green:#00FF00;
+      --green-soft:#b2ffb2;
+      --bg:#000000;
+      --card:#00140080;
+    }
+    html{scroll-behavior:smooth}
+    *{box-sizing:border-box}
+    body{
+      margin:0;padding:0;background:var(--bg);color:var(--green);
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;z-index:-1;opacity:.15;
+      background:url('https://media.giphy.com/media/Q9aBxHn9fTqKs/giphy.gif') repeat center/cover;
+    }
+
+    /* Topbar */
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:999;
+      background:#000c;backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--green);
+    }
+    .topbar-inner{
+      max-width:1200px;margin:0 auto;display:flex;gap:16px;align-items:center;
+      padding:10px 16px;
+    }
+    .brand{
+      font-family:'Orbitron',sans-serif;font-weight:500;letter-spacing:.5px;
+      text-decoration:none;color:var(--green);margin-right:auto;
+      text-shadow:0 0 12px var(--green);
+    }
+    .nav a{
+      color:var(--green);text-decoration:none;font-weight:600;opacity:.9;
+      padding:6px 10px;border-radius:8px;outline:none;
+    }
+    .nav a:hover,.nav a:focus-visible{background:#00330080}
+
+    body{padding-top:60px}
+
+    /* Hero */
+    .hero{
+      max-width:1200px;margin:24px auto 0;padding:0 20px 20px;
+      text-align:center;
+    }
+    .hero h1{
+      margin:14px 0 10px;font-size:clamp(32px,6vw,54px);
+      font-family:'Orbitron',sans-serif;text-shadow:0 0 20px var(--green);
+      animation:titleMove 10s ease-in-out infinite alternate;
+    }
+    .hero p{
+      margin:0 auto;color:var(--green-soft);max-width:760px;line-height:1.6;
+      font-size:clamp(16px,2.2vw,18px);
+    }
+    .cta{
+      margin-top:18px;display:inline-flex;align-items:center;gap:10px;
+      background:var(--green);color:#000;border:none;padding:10px 18px;
+      font-weight:800;cursor:pointer;border-radius:12px;
+    }
+    @keyframes titleMove{0%{transform:translateX(0)}50%{transform:translateX(10px)}100%{transform:translateX(-10px)}}
+
+    /* Sections + reveal */
+    section{
+      max-width:1200px;margin:60px auto;padding:0 20px;
+      opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease;
+      text-align:center; /* center headings & main text */
+    }
+    section.visible{opacity:1;transform:translateY(0)}
+    h2{
+      color:var(--green);border-bottom:2px solid var(--green);padding-bottom:6px;margin-bottom:18px;
+      display:inline-block; /* keep underline tight & centered */
+    }
+    p,li{color:var(--green-soft);line-height:1.7}
+    ul{padding-left:0; list-style-position:inside} /* keep lists centered */
+    strong{color:#fff}
+
+    /* Gallery (centered 3+3 on desktop) */
+    .image-compare{
+      display:grid;gap:24px;
+      grid-template-columns:repeat(3, minmax(260px, 1fr)); /* exactly 3 per row on desktop */
+      justify-items:center; /* center cards inside each column */
+      justify-content:center; /* center the whole grid if narrower than container */
+    }
+    .image-slot{
+      width:100%;
+      max-width:360px; /* keeps cards nicely centered and equal width */
+      border:1px solid var(--green);padding:12px;background-color:var(--card);border-radius:12px;
+    }
+    .image-title{font-size:1.05em;margin-bottom:8px;color:#aaffaa}
+    .image-container{
+      position:relative;width:100%;aspect-ratio:3/4;border-radius:10px;overflow:hidden;margin:0 auto;
+    }
+    .image-fake,.image-real{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease-in-out;
+    }
+    .image-real{opacity:0}
+    .image-container:hover .image-real,.image-container:focus-within .image-real{opacity:1}
+    .badge{
+      position:absolute;top:8px;left:8px;padding:4px 8px;border-radius:999px;
+      background:#000c;border:1px solid var(--green);font-size:.8rem;font-weight:800;
+    }
+    .image-container .badge::after{content:"AI"}
+    .image-container:hover .badge::after,.image-container:focus-within .badge::after{content:"REAL"}
+    .hint{font-size:.85rem;color:#aaffaa80;text-align:center;margin-top:8px}
+
+    /* Tools */
+    .tool{
+      margin:10px auto 14px;padding:12px;border:1px dashed var(--green);border-radius:12px;background:#00140040;
+      max-width:820px; text-align:left; /* readable width but centered block */
+    }
+    .tool a{color:var(--green);font-weight:800;text-decoration:none}
+    .tool ol{margin:8px 0 0 1.25rem}
+
+    /* Quiz */
+    .quiz-section{text-align:center}
+    .quiz-img{width:300px;max-width:90vw;margin-bottom:14px;border-radius:10px;border:1px solid var(--green)}
+    button{background:var(--green);color:#000;border:none;padding:10px 20px;margin:5px;font-weight:800;cursor:pointer;border-radius:10px}
+    button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+    .result{margin-top:14px;font-size:1.1em}
+    :focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:8px}
+
+    /* Scroll progress bar */
+    .progress{
+      position:fixed;right:12px;top:70px;bottom:12px;width:6px;border-radius:6px;
+      background:#00330080;z-index:998;overflow:hidden
+    }
+    .progress-inner{
+      width:100%;height:0%;background:var(--green);box-shadow:0 0 12px var(--green);transition:height .12s linear
+    }
+
+    /* Ethics */
+    .ethics{
+      border:1px solid var(--green);border-radius:12px;padding:16px;background:#00140066;
+      max-width:820px;margin:0 auto;text-align:left;
+    }
+
+    /* Footer */
+    footer{ text-align:center;padding:40px;font-size:1em;color:var(--green) }
+
+    /* Responsive: keep centered, drop to 2 columns then 1 */
+    @media (max-width:1024px){
+      .image-compare{grid-template-columns:repeat(2, minmax(220px, 1fr));}
+    }
+    @media (max-width:620px){
+      .image-compare{grid-template-columns:1fr;}
+      ul{list-style-position:outside; padding-left:20px; text-align:left; max-width:820px; margin:0 auto;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Topbar -->
+  <header class="topbar" role="navigation" aria-label="Main navigation">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">Museum of Lies</a>
+      <nav class="nav">
+        <a href="#gallery">Gallery</a>
+        <a href="#cyber-risks">Risks</a>
+        <a href="#tools">Tools</a>
+        <a href="#ai-how">How It Works</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#ethics">Ethics</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Scroll progress -->
+  <div class="progress" aria-hidden="true"><div class="progress-inner" id="progressInner"></div></div>
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <h1>Museum <span style="opacity:.8">of Lies</span></h1>
+    <p>A site that shows how easily AI-generated images can fool us — and, more importantly, how to
+      <strong>expose</strong> them with simple verification techniques and a sharper eye.</p>
+    <button class="cta" onclick="document.querySelector('#gallery').scrollIntoView({behavior:'smooth'})" aria-label="Go to the Gallery">Start with the Gallery ⤵</button>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery" aria-labelledby="gallery-title">
+    <h2 id="gallery-title">Gallery</h2>
+    <p style="max-width:820px;margin:0 auto 18px;">Hover to reveal the original image.</p>
+    <div class="image-compare">
+
+      <!-- SLOT 1 -->
+      <div class="image-slot">
+        <div class="image-title">Donald Trump as the Pope</div>
+        <div class="image-container" tabindex="0" aria-label="Compare: AI vs real image of Donald Trump">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/trumpfake.png" alt="AI-generated: Donald Trump dressed as the Pope">
+          <img class="image-real" src="images/gallery/trump.png" alt="Real: Donald Trump">
+        </div>
+        <div class="hint">Hint: hover to see the original</div>
+      </div>
+
+      <!-- SLOT 2 -->
+      <div class="image-slot">
+        <div class="image-title">Obama on the One-Dollar Bill</div>
+        <div class="image-container" tabindex="0" aria-label="Compare: fake dollar with Obama vs real dollar">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/fakedollar.png" alt="Fake dollar bill with Obama's portrait (AI)">
+          <img class="image-real" src="images/gallery/dollar.png" alt="Real one-dollar bill">
+        </div>
+        <div class="hint">Hint: lettering and seals often give it away</div>
+      </div>
+
+      <!-- SLOT 3 -->
+      <div class="image-slot">
+        <div class="image-title">Mona Lisa Standing</div>
+        <div class="image-container" tabindex="0" aria-label="Compare: standing Mona Lisa (AI) vs original painting">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/fakemona.png" alt="AI-created full-body Mona Lisa">
+          <img class="image-real" src="images/gallery/realmona.png" alt="Original Mona Lisa by Leonardo da Vinci">
+        </div>
+        <div class="hint">Hint: hands, clothing edges and shadow are weak spots</div>
+      </div>
+
+      <!-- SLOT 4 -->
+      <div class="image-slot">
+        <div class="image-title">Michael Jackson Aged</div>
+        <div class="image-container" tabindex="0" aria-label="Compare: AI-aged MJ vs real photo">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/oldmj.png" alt="Michael Jackson artificially aged (AI)">
+          <img class="image-real" src="images/gallery/youngmj.jpg" alt="Real young Michael Jackson">
+        </div>
+        <div class="hint">Hint: plastic-looking skin and odd eyes = suspicious</div>
+      </div>
+
+      <!-- SLOT 5 -->
+      <div class="image-slot">
+        <div class="image-title">Putin in Jail?</div>
+        <div class="image-container" tabindex="0" aria-label="Compare: Putin behind bars (AI) vs real photo">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/putinjail.png" alt="AI-generated image of Putin in a cell">
+          <img class="image-real" src="images/gallery/putin.png" alt="Real photo of Putin">
+        </div>
+        <div class="hint">Hint: bars, chains and shadows often ‘bug out’</div>
+      </div>
+
+      <!-- SLOT 6 (fake-only viral) -->
+      <div class="image-slot">
+        <div class="image-title">Pentagon Explosion (AI Hoax)</div>
+        <div class="image-container" aria-label="Viral fake image of the Pentagon explosion" tabindex="0">
+          <span class="badge" aria-hidden="true"></span>
+          <img class="image-fake" src="images/gallery/pentagon.jpg" alt="Fake Pentagon explosion image (AI)">
+        </div>
+        <div class="hint">Hint: always confirm with official/news sources</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Risks -->
+<section id="cyber-risks" aria-labelledby="risks-title">
+  <h2 id="risks-title">Cybersecurity Risks</h2>
+  <p><strong>AI-generated images</strong> can deceive, steal information, or build false narratives. Common uses:</p>
+  <ul>
+    <li>
+      <details>
+        <summary><strong>Phishing</strong> impersonating executives/brands</summary>
+        <p>Fake emails that imitate companies or important people to steal passwords or money.</p>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary><strong>Fake profiles</strong> for social engineering</summary>
+        <p>Social media accounts created to deceive, manipulate, or even trick people in scams.</p>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary><strong>Fabricated “evidence”</strong> for scams and defamation</summary>
+        <p>Fake images used to destroy someone’s reputation or spread false news.</p>
+      </details>
+    </li>
+  </ul>
+</section>
+
+<style>
+  #cyber-risks ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  #cyber-risks li {
+    margin: 8px 0;
+  }
+
+  #cyber-risks details {
+    background-color: rgba(0, 20, 0, 0.5);
+    border: 1px solid #00FF00;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+
+  #cyber-risks summary {
+    font-weight: bold;
+    color: #00FF00;
+    cursor: pointer;
+  }
+
+  #cyber-risks p {
+    margin: 8px 0 0 0;
+    color: #b2ffb2;
+    line-height: 1.5;
+  }
+</style>
+
+
+  <!-- Tools (micro-guides) -->
+  <section id="tools" aria-labelledby="tools-title">
+    <h2 id="tools-title">Real Tools to Detect AI Fakes</h2>
+
+    <div class="tool">
+      <p><strong><a href="https://fotoforensics.com/" target="_blank" rel="noopener">FotoForensics</a></strong> — metadata & ELA</p>
+      <ol>
+        <li>Open the image on the site</li>
+        <li>Check <em>EXIF</em> and the error-level map (ELA)</li>
+        <li>Look for inconsistent compression zones</li>
+      </ol>
+    </div>
+
+    <div class="tool">
+      <p><strong><a href="https://tineye.com/" target="_blank" rel="noopener">TinEye</a></strong> — reverse search</p>
+      <ol>
+        <li>Upload the image</li>
+        <li>Compare versions / first-seen dates</li>
+        <li>Confirm the original source</li>
+      </ol>
+    </div>
+
+    <div class="tool">
+      <p><strong><a href="https://deepware.ai/" target="_blank" rel="noopener">Deepware</a></strong> — detect deepfakes (video)</p>
+      <ol>
+        <li>Submit a short clip</li>
+        <li>Review the report</li>
+        <li>Combine with journalistic verification</li>
+      </ol>
+    </div>
+
+    <div class="tool">
+      <p><strong><a href="https://hivemoderation.com/" target="_blank" rel="noopener">Hive Moderation</a></strong> — AI-altered content</p>
+      <ol>
+        <li>Submit the image</li>
+        <li>Review classes and probabilities</li>
+        <li>Use as <em>signal</em>, not final proof</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="ai-how" aria-labelledby="aihow-title">
+    <h2 id="aihow-title">How AI Generates Images</h2>
+    <p><strong>Artificial Intelligence</strong> can create photorealistic images using models like:</p>
+    <ul>
+      <li><strong>GANs</strong> — two networks competing to improve realism</li>
+      <li><strong>Diffusion models</strong> — start from noise and refine into detail</li>
+    </ul>
+    <img src="images/ai/how_ai_works.png" alt="Simple diagram of AI image generation (GANs and Diffusion)" class="ai-graphic" style="display:block;margin:30px auto;max-width:100%;">
+    <p>The result can look <strong>real</strong>, but small artifacts often reveal it to a trained eye.</p>
+  </section>
+
+  <!-- Quiz -->
+  <section id="quiz" class="quiz-section" aria-labelledby="quiz-title">
+    <h2 id="quiz-title">Quiz: Real or Fake?</h2>
+    <p>Try to guess which ones were made by AI.</p>
+    <img src="images/quiz/example1.jpg" class="quiz-img" id="quizImg" alt="Quiz image">
+    <div role="group" aria-label="Quiz options">
+      <button onclick="answer(true)" aria-label="Answer: Real">Real</button>
+      <button onclick="answer(false)" aria-label="Answer: Fake">Fake</button>
+    </div>
+    <div class="result" id="quizResult" role="status" aria-live="polite"></div>
+  </section>
+
+  <section id="quiz-end" class="quiz-section" style="display:none" aria-labelledby="quizfinal-title">
+    <h2 id="quizfinal-title">Final Message</h2>
+    <p><strong>See how easy it is to get fooled — trust more than what you see.</strong><br>All images you just saw were generated or modified by AI. Stay alert, question what you see, and verify the source.</p>
+  </section>
+
+  <!-- Ethics -->
+  <section id="ethics" aria-labelledby="ethics-title">
+    <h2 id="ethics-title">Ethics & Rights</h2>
+    <div class="ethics">
+      <ul>
+        <li><strong>Educational purpose:</strong> digital literacy and cyber hygiene.</li>
+        <li><strong>Generated/modified content:</strong> fake images here were created for controlled demonstration.</li>
+        <li><strong>Context matters:</strong> avoid sharing images out of context; always check the source.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Educational project by the group <span style="color:#b2ffb2;">Tecno</span>.</strong></p>
+    <p>All fake images used on this site were generated for awareness and educational purposes.</p>
+  </footer>
+
+  <script>
+    // Reveal on scroll
+    const observer = new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){ entry.target.classList.add('visible');}
+      });
+    },{threshold:0.1});
+    document.querySelectorAll('section').forEach(s=>observer.observe(s));
+
+    // Quiz (same logic)
+    const quizImages=[
+      "images/quiz/example1.jpg",
+      "images/quiz/example2.jpg",
+      "images/quiz/example3.jpg",
+      "images/quiz/example4.jpg",
+      "images/quiz/example5.jpg"
+    ];
+    let currentImage=0;
+    function answer(userChoice){
+      const correct=!userChoice; // all are fake
+      const feedback=correct?'✔️ Correct!':'❌ Wrong, this was made by AI.';
+      document.getElementById('quizResult').textContent=feedback;
+      setTimeout(()=>{
+        currentImage++;
+        if(currentImage>=quizImages.length){
+          document.querySelector('#quiz').style.display='none';
+          document.querySelector('#quiz-end').style.display='block';
+        }else{
+          document.getElementById('quizImg').src=quizImages[currentImage];
+          document.getElementById('quizResult').textContent="";
+        }
+      },1500);
+    }
+
+    // Scroll progress
+    const progressInner=document.getElementById('progressInner');
+    function onScroll(){
+      const scrollTop=window.scrollY||document.documentElement.scrollTop;
+      const docHeight=document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight>0 ? (scrollTop/docHeight)*100 : 0;
+      progressInner.style.height = percent + "%";
+    }
+    document.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  </script>
+</body>
+</html>
+
